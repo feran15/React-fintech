@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
-
+import { Link } from "react-router-dom";
 // ✅ Type for form data
 type AuthFormData = {
   email: string;
@@ -49,8 +49,9 @@ const Login: React.FC<LoginFormProps> = ({ switchToSignup }) => {
   return (
     <div className="bg-black min-h-screen flex items-center justify-center">
       <div className="bg-[rgb(27,27,27)]  p-8 rounded-lg shadow-lg border w-full max-w-md">
+        <Link to="/">
       <img className="w-[100px] ms-35 " src="/Bg.png" alt="" />
-
+        </Link>
         <form onSubmit={handleSubmit(onSubmit)}>
           {/* Email */}
           <div className="mb-4">
