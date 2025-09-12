@@ -33,7 +33,7 @@ function Layout() {
         <Route path="/login" element={<Login />} />
       </Routes>
 
-      {!hideLayout && <Footer />}
+      {!hideLayout}
     </>
   );
 }

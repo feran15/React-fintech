@@ -49,7 +49,7 @@ const Login: React.FC<LoginFormProps> = ({ switchToSignup }) => {
   return (
     <div className="bg-black min-h-screen flex items-center justify-center">
       <div className="bg-[rgb(27,27,27)]  p-8 rounded-lg shadow-lg border w-full max-w-md">
-      <img className="w-[100px] ms-35" src="/Bg.png" alt="" />
+      <img className="w-[100px] ms-35 " src="/Bg.png" alt="" />
 
         <form onSubmit={handleSubmit(onSubmit)}>
           {/* Email */}
