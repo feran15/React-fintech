@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Menu, X,  ChevronRight } from "lucide-react"; // npm install lucide-react
-
+import { Link } from "react-router-dom";
 // Define the type for nav links
 type NavLink = {
   label: string;
@@ -32,8 +32,9 @@ const Nav: React.FC = () => {
     <nav className="bg-white shadow-sm sticky top-0 z-50">
       <div className="max-w-6xl mx-auto flex items-center justify-between px-5">
         {/* Logo */}
+        <Link to="/">
         <img src="/N26.png" alt="Kuda logo" className="w-auto h-20" />
-
+        </Link>
         {/* Desktop Nav */}
         <ul className="hidden md:flex gap-8 text-gray-800 font-medium">
           {desktopLinks.map((link, idx) => (
@@ -48,12 +49,9 @@ const Nav: React.FC = () => {
 
         {/* Desktop Right */}
         <div className="hidden md:flex items-center gap-6">
-          <a
-            href="#"
-            className="text-[rgb(8,129,119)] hover:text-purple-800 font-medium"
-          >
-            Log In
-          </a>
+         <Link to="/auth" className="text-[rgb(8,129,119)] hover:text-purple-800 font-mediumx">
+              Log in
+            </Link>
           <a
             href="#"
             className="bg-[rgb(8,129,119)] text-white px-5 py-2 rounded-lg font-semibold transition"
@@ -81,12 +79,12 @@ const Nav: React.FC = () => {
 
           {/* Buttons */}
           <div className="flex gap-3 mb-6">
-            <a
-              href="#"
+            <Link
+              to="/auth"
               className="bg-[rgb(8,129,119)] text-white px-4 py-2 rounded-lg font-medium flex-1 text-center"
             >
               Log in
-            </a>
+            </Link>
             <a
               href="#"
               className="bg-[rgb(8,129,119)] text-white px-4 py-2 rounded-lg font-medium flex-1 text-center"
