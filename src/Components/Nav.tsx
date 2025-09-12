@@ -49,7 +49,7 @@ const Nav: React.FC = () => {
 
         {/* Desktop Right */}
         <div className="hidden md:flex items-center gap-6">
-         <Link to="/auth" className="text-[rgb(8,129,119)] hover:text-purple-800 font-mediumx">
+         <Link to="/login" className="text-[rgb(8,129,119)] hover:text-purple-800 font-mediumx">
               Log in
             </Link>
           <a
@@ -80,7 +80,7 @@ const Nav: React.FC = () => {
           {/* Buttons */}
           <div className="flex gap-3 mb-6">
             <Link
-              to="/auth"
+              to="/login"
               className="bg-[rgb(8,129,119)] text-white px-4 py-2 rounded-lg font-medium flex-1 text-center"
             >
               Log in
