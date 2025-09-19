@@ -1,5 +1,5 @@
 import React from "react";
-import { AIInsight } from "./types";
+import type { AIInsight } from "./types";
 import { Sparkles } from "lucide-react";
 
 interface Props {
