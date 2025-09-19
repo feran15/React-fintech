@@ -29,7 +29,7 @@ const NeuroBankDashboard: React.FC = () => {
         apiService.getCurrentUser(),
         apiService.getAccounts(),
         apiService.getTransactions(10),
-        apiService.getAnalytics("This Month"),
+        apiService.getAnalytics(),
         apiService.getSpendingCategories(),
         apiService.getAIInsights(),
       ]);

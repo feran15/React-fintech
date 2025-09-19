@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from "react-router-dom";
-import { AuthProvider, useAuth } from "./context/AuthContext";
+import { AuthProvider} from "./context/AuthContext";
 import ProtectedRoute from "./context/ProtectedRoute";
 
 import Nav from "../src/Components/Nav";
@@ -16,7 +16,7 @@ import Dashboard from "./Components/Dashboard"; // index.tsx resolves this
 function Layout() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { login } = useAuth();
+  // const { login } = useAuth();
 
   // hide Nav & Footer on login and register
   const hideLayout = location.pathname === "/login" || location.pathname === "/register";
