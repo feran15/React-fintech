@@ -1,4 +1,5 @@
 import { useForm} from "react-hook-form";
+import type { SubmitHandler } from "react-hook-form";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -11,7 +12,7 @@ type AuthFormData = {
 };
 
 interface LoginFormProps {
-  switchToSignup: () => void;
+ switchToSignup: () => void;
 }
 
 const Login: React.FC<LoginFormProps> = ({ switchToSignup }) => {
@@ -27,7 +28,7 @@ const Login: React.FC<LoginFormProps> = ({ switchToSignup }) => {
   // ✅ Submit handler
   const onSubmit: SubmitHandler<AuthFormData> = async (data) => {
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/login", data);
+      const res = await axios.post("http://localhost:5000/api/User/login", data);
 
       // ✅ Save token to localStorage
       localStorage.setItem("token", res.data.token);
@@ -40,7 +41,7 @@ const Login: React.FC<LoginFormProps> = ({ switchToSignup }) => {
       toast.success("Login successful!");
 
       // ✅ Redirect to dashboard
-      navigate("/dashboard");
+      // navigate("/dashboard");
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Login failed");
     }

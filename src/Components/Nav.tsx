@@ -52,12 +52,13 @@ const Nav: React.FC = () => {
          <Link to="/login" className="text-[rgb(8,129,119)] hover:text-purple-800 font-mediumx">
               Log in
             </Link>
-          <a
-            href="#"
+            
+          <Link
+            to= "/register"
             className="bg-[rgb(8,129,119)] text-white px-5 py-2 rounded-lg font-semibold transition"
           >
             Open Bank Account
-          </a>
+          </Link>
         </div>
 
         {/* Mobile Hamburger */}

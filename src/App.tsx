@@ -6,13 +6,13 @@ import SubFooter from './Components/SubFooter'
 import Section from './Components/Section'
 import Footer from './Components/Footer'
 import Login from './Components/Login'
-
+import FAQs from "./Components/FAQs";
+import Register from './Components/Register'
 function Layout() {
   const location = useLocation();
 
-  // hide Nav & Footer on login
-  const hideLayout = location.pathname === "/login";
-
+  // hide Nav & Footer on login and signup
+  const hideLayout = location.pathname === "/login" || location.pathname === "/register";
   return (
     <>
       {!hideLayout && <Nav />}
@@ -27,10 +27,12 @@ function Layout() {
               <SubFooter />
               <Section />
               <Footer />
+              <FAQs/>
             </>
           }
         />
         <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
       </Routes>
 
       {!hideLayout}
