@@ -132,13 +132,14 @@ const Register: React.FC<RegisterFormProps> = ({ switchToLogin }) => {
 
         <p className="mt-4 text-center text-sm">
           Already have an account?{" "}
-          <button
+          <Link
+          to="/login"
             type="button"
             onClick={switchToLogin}
             className="text-teal-600 font-semibold hover:cursor-pointer"
           >
             Log in
-          </button>
+          </Link>
         </p>
       </div>
     </div>

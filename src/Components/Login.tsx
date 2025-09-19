@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
+import { Link2OffIcon } from "lucide-react";
 // ✅ Type for form data
 type AuthFormData = {
   email: string;
@@ -93,13 +94,14 @@ const Login: React.FC<LoginFormProps> = ({ switchToSignup }) => {
         </form>
 
         <p className="mt-4 text-center text-sm">
-          <button
+          <Link
+          to= "/register" 
             type="button"
             onClick={switchToSignup}
             className="text-teal-600 font-semibold leading-relaxed hover:cursor-pointer"
           >
             Create an account
-          </button>
+          </Link>
         </p>
       </div>
     </div>
