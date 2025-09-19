@@ -1,11 +1,10 @@
 import { useForm} from "react-hook-form";
 import type { SubmitHandler } from "react-hook-form";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
-import { Link2OffIcon } from "lucide-react";
 // ✅ Type for form data
 type AuthFormData = {
   email: string;
@@ -23,8 +22,8 @@ const Login: React.FC<LoginFormProps> = ({ switchToSignup }) => {
     formState: { errors, isSubmitting },
   } = useForm<AuthFormData>();
 
-  const [showPassword, setShowPassword] = useState(false);
-  const navigate = useNavigate();
+   const [showPassword, setShowPassword] = useState(false);
+  //  const navigate = useNavigate();
 
   // ✅ Submit handler
   const onSubmit: SubmitHandler<AuthFormData> = async (data) => {
@@ -77,6 +76,13 @@ const Login: React.FC<LoginFormProps> = ({ switchToSignup }) => {
                 className="w-full p-2 border rounded placeholder-white"
                 placeholder="Password"
               />
+               <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="ml-2 text-sm text-teal-500"
+              >
+                {showPassword ? "Hide" : "Show"}
+              </button>
             </div>
             {errors.password && (
               <p className="text-red-500 text-sm">{errors.password.message}</p>

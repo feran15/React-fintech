@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from "react-router-dom";
 import Nav from '../src/Components/Nav'
 import Home from '../src/Components/Home'
 import HomeSection from './Components/HomeSection'
@@ -10,7 +10,7 @@ import FAQs from "./Components/FAQs";
 import Register from './Components/Register'
 function Layout() {
   const location = useLocation();
-
+  const navigate = useNavigate();
   // hide Nav & Footer on login and signup
   const hideLayout = location.pathname === "/login" || location.pathname === "/register";
   return (
@@ -31,8 +31,8 @@ function Layout() {
             </>
           }
         />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+        <Route path="/login" element={<Login  switchToSignup={() => navigate("/register")} />} />
+        <Route path="/register" element={<Register  switchToLogin={() => navigate("/login")} />} />
       </Routes>
 
       {!hideLayout}
