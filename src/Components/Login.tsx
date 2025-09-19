@@ -13,6 +13,7 @@ type AuthFormData = {
 
 interface LoginFormProps {
  switchToSignup: () => void;
+   onSuccess: () => void | Promise<void>;
 }
 
 const Login: React.FC<LoginFormProps> = ({ switchToSignup }) => {

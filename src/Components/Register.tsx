@@ -15,6 +15,7 @@ type AuthFormData = {
 
 interface RegisterFormProps {
   switchToLogin: () => void;
+    onSuccess: () => void | Promise<void>;
 }
 
 const Register: React.FC<RegisterFormProps> = ({ switchToLogin }) => {
