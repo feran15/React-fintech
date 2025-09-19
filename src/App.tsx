@@ -1,19 +1,26 @@
 import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from "react-router-dom";
-import Nav from '../src/Components/Nav'
-import Home from '../src/Components/Home'
-import HomeSection from './Components/HomeSection'
-import SubFooter from './Components/SubFooter'
-import Section from './Components/Section'
-import Footer from './Components/Footer'
-import Login from './Components/Login'
+import { AuthProvider, useAuth } from "./context/AuthContext";
+import ProtectedRoute from "./context/ProtectedRoute";
+
+import Nav from "../src/Components/Nav";
+import Home from "../src/Components/Home";
+import HomeSection from "./Components/HomeSection";
+import SubFooter from "./Components/SubFooter";
+import Section from "./Components/Section";
+import Footer from "./Components/Footer";
+import Login from "./Components/Login";
 import FAQs from "./Components/FAQs";
-import Register from './Components/Register'
-import Dashboard from "./Components/Dashboard";
+import Register from "./Components/Register";
+import Dashboard from "./Components/Dashboard"; // index.tsx resolves this
+
 function Layout() {
   const location = useLocation();
   const navigate = useNavigate();
-  // hide Nav & Footer on login and signup
+  const { login } = useAuth();
+
+  // hide Nav & Footer on login and register
   const hideLayout = location.pathname === "/login" || location.pathname === "/register";
+
   return (
     <>
       {!hideLayout && <Nav />}
@@ -23,18 +30,33 @@ function Layout() {
           path="/"
           element={
             <>
-              {/* <Home />
+              <Home />
               <HomeSection />
               <SubFooter />
               <Section />
               <Footer />
-              <FAQs/> */}
-              <Dashboard />
+              <FAQs />
             </>
           }
         />
-        <Route path="/login" element={<Login  switchToSignup={() => navigate("/register")} />} />
-        <Route path="/register" element={<Register  switchToLogin={() => navigate("/login")} />} />
+        <Route
+          path="/login"
+          element={<Login switchToSignup={() => navigate("/register")} onSuccess={() => navigate("/dashboard")} />}
+        />
+        <Route
+          path="/register"
+          element={<Register switchToLogin={() => navigate("/login")} onSuccess={() => navigate("/dashboard")} />}
+        />
+
+        {/* Protected Dashboard Route */}
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
 
       {!hideLayout}
@@ -44,8 +66,10 @@ function Layout() {
 
 export default function App() {
   return (
-    <Router>
-      <Layout />
-    </Router>
+    <AuthProvider>
+      <Router>
+        <Layout />
+      </Router>
+    </AuthProvider>
   );
 }
