@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from "react";
 import Sidebar from "./Sidebar";
+import AIInsights from "../Components/AIInsight";
+import BalanceOverview from "./BalanceOverview";
+import Earnings from "./Earnings";
+import Spending from "./Spending";
+import Transactions from "../Components/Transaction";
 import apiService from "./apiService";
 import type { User, Account, Transaction, AnalyticsData, SpendingCategory, AIInsight } from "./types";
 import { Loader2, AlertCircle } from "lucide-react";
@@ -71,7 +76,21 @@ const NeuroBankDashboard: React.FC = () => {
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 text-white">
       <Sidebar userName={user?.name} lastLoginDate={user?.lastLoginDate} />
-      <div className="flex-1 p-8">{/* Grid components will go here */}</div>
+      <div className="flex-1 p-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <AIInsights insights={aiInsights} />
+        <BalanceOverview accounts={accounts} monthlyChange={analytics?.monthlyChange || 0} />
+        <Earnings
+          earnings={analytics?.earnings || 0}
+          change={analytics?.earningsChange || 0}
+          percentage={analytics?.earningsPercentage || 0}
+        />
+        <Spending
+          spending={analytics?.spending || 0}
+          change={analytics?.spendingChange || 0}
+          categories={spendingCategories}
+        />
+        <Transactions transactions={transactions} />
+      </div>
     </div>
   );
 };
