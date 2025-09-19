@@ -1,10 +1,11 @@
-import { useForm} from "react-hook-form";
+import { useForm } from "react-hook-form";
 import type { SubmitHandler } from "react-hook-form";
 import { useState } from "react";
-// import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext"; // connect to AuthContext
+
 // ✅ Type for form data
 type AuthFormData = {
   email: string;
@@ -12,27 +13,27 @@ type AuthFormData = {
 };
 
 interface LoginFormProps {
- switchToSignup: () => void;
-   onSuccess: () => void | Promise<void>;
+  switchToSignup: () => void;
+  onSuccess: () => void | Promise<void>;
 }
 
-const Login: React.FC<LoginFormProps> = ({ switchToSignup }) => {
+const Login: React.FC<LoginFormProps> = ({ switchToSignup, onSuccess }) => {
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<AuthFormData>();
 
-   const [showPassword, setShowPassword] = useState(false);
-  //  const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
+  const { login } = useAuth(); // ✅ get login method from context
 
   // ✅ Submit handler
   const onSubmit: SubmitHandler<AuthFormData> = async (data) => {
     try {
       const res = await axios.post("http://localhost:5000/api/User/login", data);
 
-      // ✅ Save token to localStorage
-      localStorage.setItem("token", res.data.token);
+      // ✅ Save token via AuthContext
+      login(res.data.token);
 
       // ✅ Optionally save user info
       if (res.data.user) {
@@ -41,8 +42,8 @@ const Login: React.FC<LoginFormProps> = ({ switchToSignup }) => {
 
       toast.success("Login successful!");
 
-      // ✅ Redirect to dashboard
-      // navigate("/dashboard");
+      // ✅ Tell parent (Layout) to redirect to dashboard
+      onSuccess();
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Login failed");
     }
@@ -50,10 +51,11 @@ const Login: React.FC<LoginFormProps> = ({ switchToSignup }) => {
 
   return (
     <div className="bg-black min-h-screen flex items-center justify-center">
-      <div className="bg-[rgb(27,27,27)]  p-8 rounded-lg shadow-lg border w-full max-w-md">
+      <div className="bg-[rgb(27,27,27)] p-8 rounded-lg shadow-lg border w-full max-w-md">
         <Link to="/">
-      <img className="w-[100px] ms-35 " src="/Bg.png" alt="" />
+          <img className="w-[100px] ms-35" src="/Bg.png" alt="logo" />
         </Link>
+
         <form onSubmit={handleSubmit(onSubmit)}>
           {/* Email */}
           <div className="mb-4">
@@ -77,7 +79,7 @@ const Login: React.FC<LoginFormProps> = ({ switchToSignup }) => {
                 className="w-full p-2 border rounded placeholder-white"
                 placeholder="Password"
               />
-               <button
+              <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="ml-2 text-sm text-teal-500"
@@ -94,7 +96,7 @@ const Login: React.FC<LoginFormProps> = ({ switchToSignup }) => {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full bg-teal-600 font-semibold  py-2 rounded hover:bg-teal-700 cursor-pointer transition"
+            className="w-full bg-teal-600 font-semibold py-2 rounded hover:bg-teal-700 transition"
           >
             {isSubmitting ? "Logging in..." : "Log in"}
           </button>
@@ -102,7 +104,7 @@ const Login: React.FC<LoginFormProps> = ({ switchToSignup }) => {
 
         <p className="mt-4 text-center text-sm">
           <Link
-          to= "/register" 
+            to="/register"
             type="button"
             onClick={switchToSignup}
             className="text-teal-600 font-semibold leading-relaxed hover:cursor-pointer"

@@ -11,13 +11,20 @@ const BalanceOverview: React.FC<Props> = ({ accounts, monthlyChange }) => {
   const totalBalance = accounts.reduce((sum, acc) => sum + acc.balance, 0);
 
   return (
-    <div className="bg-white/5 rounded-2xl p-6">
-      <h3 className="font-semibold mb-4">Balance Overview</h3>
-      <div className="text-3xl font-bold mb-2">
+    <div className="bg-white/5 rounded-2xl p-6 flex flex-col justify-between">
+      {/* Title */}
+      <h3 className="font-semibold mb-4 text-base md:text-lg">
+        Balance Overview
+      </h3>
+
+      {/* Total Balance */}
+      <div className="text-2xl md:text-3xl font-bold mb-2 break-words">
         ${totalBalance.toLocaleString()}
       </div>
+
+      {/* Monthly Change */}
       <div
-        className={`flex items-center gap-2 text-sm ${
+        className={`flex items-center gap-2 text-xs md:text-sm font-medium ${
           monthlyChange >= 0 ? "text-green-400" : "text-red-400"
         }`}
       >
@@ -26,7 +33,7 @@ const BalanceOverview: React.FC<Props> = ({ accounts, monthlyChange }) => {
         ) : (
           <TrendingDown className="w-4 h-4" />
         )}
-        <span>{monthlyChange}% vs last month</span>
+        <span>{Math.abs(monthlyChange)}% vs last month</span>
       </div>
     </div>
   );

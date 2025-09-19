@@ -1,9 +1,10 @@
 import { useForm } from "react-hook-form";
 import type { SubmitHandler } from "react-hook-form";
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { useAuth } from "../context/AuthContext"; // ✅ connect to AuthContext
 
 // ✅ Type for form data
 type AuthFormData = {
@@ -15,10 +16,10 @@ type AuthFormData = {
 
 interface RegisterFormProps {
   switchToLogin: () => void;
-    onSuccess: () => void | Promise<void>;
+  onSuccess: () => void | Promise<void>;
 }
 
-const Register: React.FC<RegisterFormProps> = ({ switchToLogin }) => {
+const Register: React.FC<RegisterFormProps> = ({ switchToLogin, onSuccess }) => {
   const {
     register,
     handleSubmit,
@@ -26,18 +27,15 @@ const Register: React.FC<RegisterFormProps> = ({ switchToLogin }) => {
   } = useForm<AuthFormData>();
 
   const [showPassword, setShowPassword] = useState(false);
-  const navigate = useNavigate();
+  const { login } = useAuth(); // ✅ from AuthContext
 
   // ✅ Submit handler
   const onSubmit: SubmitHandler<AuthFormData> = async (data) => {
     try {
-      const res = await axios.post(
-        "http://localhost:5000/api/User/register",
-        data
-      );
+      const res = await axios.post("http://localhost:5000/api/User/register", data);
 
-      // ✅ Save token to localStorage
-      localStorage.setItem("token", res.data.token);
+      // ✅ Save token via AuthContext
+      login(res.data.token);
 
       // ✅ Optionally save user info
       if (res.data.user) {
@@ -47,25 +45,26 @@ const Register: React.FC<RegisterFormProps> = ({ switchToLogin }) => {
       toast.success("Registration successful!");
 
       // ✅ Redirect to dashboard
-      navigate("/dashboard");
+      onSuccess();
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Registration failed");
     }
   };
 
   return (
-    <div className="bg-black min-h-screen flex items-center justify-center ">
-      <div className="bg-[rgb(27,27,27)] p-8 rounded-lg shadow-lg border w-full max-w-md ">
+    <div className="bg-black min-h-screen flex items-center justify-center">
+      <div className="bg-[rgb(27,27,27)] p-8 rounded-lg shadow-lg border w-full max-w-md">
         <Link to="/">
-          <img className="w-[100px] ms-35 " src="/Bg.png" alt="logo" />
+          <img className="w-[100px] ms-35" src="/Bg.png" alt="logo" />
         </Link>
+
         <form onSubmit={handleSubmit(onSubmit)}>
           {/* First Name */}
           <div className="mb-4">
             <input
               type="text"
               {...register("firstName", { required: "First name is required" })}
-              className="w-full p-2 border rounded placeholder-white "
+              className="w-full p-2 border rounded placeholder-white"
               placeholder="First Name"
             />
             {errors.firstName && (
@@ -125,7 +124,7 @@ const Register: React.FC<RegisterFormProps> = ({ switchToLogin }) => {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full bg-teal-600 font-semibold py-2 rounded hover:bg-teal-700 cursor-pointer transition"
+            className="w-full bg-teal-600 font-semibold py-2 rounded hover:bg-teal-700 transition"
           >
             {isSubmitting ? "Registering..." : "Register"}
           </button>
@@ -134,7 +133,7 @@ const Register: React.FC<RegisterFormProps> = ({ switchToLogin }) => {
         <p className="mt-4 text-center text-sm">
           Already have an account?{" "}
           <Link
-          to="/login"
+            to="/login"
             type="button"
             onClick={switchToLogin}
             className="text-teal-600 font-semibold hover:cursor-pointer"

@@ -10,13 +10,18 @@ interface Props {
 
 const Spending: React.FC<Props> = ({ spending, change, categories }) => {
   return (
-    <div className="bg-white/5 rounded-2xl p-6">
-      <h3 className="font-semibold mb-4">Spending</h3>
-      <div className="text-3xl font-bold mb-2">
+    <div className="bg-white/5 rounded-2xl p-6 flex flex-col">
+      {/* Title */}
+      <h3 className="font-semibold mb-3 text-base sm:text-lg">Spending</h3>
+
+      {/* Total */}
+      <div className="text-2xl sm:text-3xl font-bold mb-1">
         ${spending.toLocaleString()}
       </div>
+
+      {/* Change vs last month */}
       <div
-        className={`flex items-center gap-2 text-sm mb-4 ${
+        className={`flex items-center gap-2 text-xs sm:text-sm mb-4 ${
           change >= 0 ? "text-red-400" : "text-green-400"
         }`}
       >
@@ -27,12 +32,14 @@ const Spending: React.FC<Props> = ({ spending, change, categories }) => {
         )}
         <span>{change}% vs last month</span>
       </div>
-      <div className="space-y-3">
+
+      {/* Category bars */}
+      <div className="space-y-3 flex-1">
         {categories.map((cat) => (
           <div key={cat.category}>
-            <div className="flex justify-between text-sm mb-1">
-              <span>{cat.category}</span>
-              <span>{cat.percentage}%</span>
+            <div className="flex justify-between text-xs sm:text-sm mb-1">
+              <span className="truncate">{cat.category}</span>
+              <span className="font-medium">{cat.percentage}%</span>
             </div>
             <div className="w-full bg-white/10 rounded-full h-2">
               <div
