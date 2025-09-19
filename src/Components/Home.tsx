@@ -1,5 +1,5 @@
 import React from "react";
-
+import { Link } from "react-router-dom"
 const Home: React.FC = () => {
   return (
     <div className="relative w-full h-screen overflow-hidden">
@@ -21,9 +21,11 @@ const Home: React.FC = () => {
         <p className="text-lg md:text-2xl max-w-9xl">
           Bank, save, and invest in one beautifully simple app trusted by millions
         </p>
-        <button className="mt-6 bg-white text-[rgb(8,129,119)] px-6 py-3 rounded-lg hover:cursor-pointer  transition">
+        <Link
+        to="/register"
+         className="mt-6 bg-white text-[rgb(8,129,119)] px-6 py-3 rounded-lg hover:cursor-pointer  transition">
           Open Bank Account
-        </button>
+        </Link>
       </div>
     </div>
   );
