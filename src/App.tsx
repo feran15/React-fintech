@@ -8,6 +8,7 @@ import Footer from './Components/Footer'
 import Login from './Components/Login'
 import FAQs from "./Components/FAQs";
 import Register from './Components/Register'
+import Dashboard from "./Components/Dashboard";
 function Layout() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -22,12 +23,13 @@ function Layout() {
           path="/"
           element={
             <>
-              <Home />
+              {/* <Home />
               <HomeSection />
               <SubFooter />
               <Section />
               <Footer />
-              <FAQs/>
+              <FAQs/> */}
+              <Dashboard />
             </>
           }
         />
