@@ -1,12 +1,13 @@
 import { useForm } from "react-hook-form";
 import type { SubmitHandler } from "react-hook-form";
 import { useState } from "react";
-import axios from "axios";
 import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
-import { useAuth } from "../context/AuthContext"; // connect to AuthContext
+import { useAuth } from "../context/AuthContext";
+import api from "../utils/api"; // ✅ Axios instance
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 
-// ✅ Type for form data
+// Type for form data
 type AuthFormData = {
   email: string;
   password: string;
@@ -25,24 +26,22 @@ const Login: React.FC<LoginFormProps> = ({ switchToSignup, onSuccess }) => {
   } = useForm<AuthFormData>();
 
   const [showPassword, setShowPassword] = useState(false);
-  const { login } = useAuth(); // ✅ get login method from context
+  const { login } = useAuth();
 
-  // ✅ Submit handler
+  // Submit handler
   const onSubmit: SubmitHandler<AuthFormData> = async (data) => {
     try {
-      const res = await axios.post("http://localhost:5000/api/User/login", data);
+      const res = await api.post("/User/login", data);
 
-      // ✅ Save token via AuthContext
+      // Save token via AuthContext
       login(res.data.token);
 
-      // ✅ Optionally save user info
+      // Optionally save user info in context/localStorage
       if (res.data.user) {
         localStorage.setItem("user", JSON.stringify(res.data.user));
       }
 
       toast.success("Login successful!");
-
-      // ✅ Tell parent (Layout) to redirect to dashboard
       onSuccess();
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Login failed");
@@ -56,39 +55,47 @@ const Login: React.FC<LoginFormProps> = ({ switchToSignup, onSuccess }) => {
           <img className="w-[100px] ms-35" src="/Bg.png" alt="logo" />
         </Link>
 
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           {/* Email */}
-          <div className="mb-4">
+          <div>
             <input
               type="email"
-              {...register("email", { required: "Email is required" })}
-              className="w-full p-2 border rounded placeholder-white"
+              {...register("email", {
+                required: "Email is required",
+                pattern: {
+                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                  message: "Invalid email format",
+                },
+              })}
+              className="w-full p-2 border rounded placeholder-white bg-transparent text-white"
               placeholder="Email"
             />
             {errors.email && (
-              <p className="text-red-500 text-sm">{errors.email.message}</p>
+              <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
             )}
           </div>
 
           {/* Password */}
-          <div className="mb-4">
-            <div className="flex">
+          <div>
+            <div className="flex items-center border rounded">
               <input
                 type={showPassword ? "text" : "password"}
                 {...register("password", { required: "Password is required" })}
-                className="w-full p-2 border rounded placeholder-white"
+                className="w-full p-2 placeholder-white bg-transparent text-white"
                 placeholder="Password"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="ml-2 text-sm text-teal-500"
+                className="p-2 text-teal-500"
               >
-                {showPassword ? "Hide" : "Show"}
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
             {errors.password && (
-              <p className="text-red-500 text-sm">{errors.password.message}</p>
+              <p className="text-red-500 text-sm mt-1">
+                {errors.password.message}
+              </p>
             )}
           </div>
 
@@ -96,9 +103,13 @@ const Login: React.FC<LoginFormProps> = ({ switchToSignup, onSuccess }) => {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full bg-teal-600 font-semibold py-2 rounded hover:bg-teal-700 transition"
+            className="w-full bg-teal-600 font-semibold py-2 rounded hover:bg-teal-700 transition flex justify-center items-center"
           >
-            {isSubmitting ? "Logging in..." : "Log in"}
+            {isSubmitting ? (
+              <Loader2 className="animate-spin" size={20} />
+            ) : (
+              "Log in"
+            )}
           </button>
         </form>
 

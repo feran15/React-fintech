@@ -1,6 +1,6 @@
 import type { User, Account, Transaction, AnalyticsData, SpendingCategory, AIInsight } from "./types";
 
-const API_BASE_URL = "https://banking-server-akka.onrender.com"; // Replace with your actual Render URL
+const API_BASE_URL = "https://banking-server-akka.onrender.com/ai/insights"; // Replace with your actual Render URL
 
 const apiService = {
   getCurrentUser: async (): Promise<User> => {
