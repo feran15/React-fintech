@@ -25,9 +25,11 @@ function Layout() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // hide Nav & Footer on login and register
+  // ✅ Hide Nav & Footer on login, register, and dashboard
   const hideLayout =
-    location.pathname === "/login" || location.pathname === "/register";
+    location.pathname === "/login" ||
+    location.pathname === "/register" ||
+    location.pathname === "/dashboard";
 
   return (
     <>
@@ -42,7 +44,6 @@ function Layout() {
               <HomeSection />
               <SubFooter />
               <Section />
-              <Footer />
               <FAQs />
             </>
           }
@@ -66,7 +67,9 @@ function Layout() {
           }
         />
 
-        {/* Protected Dashboard Route */}
+        <Route path="/faqs" element={<FAQs />} />
+
+        {/* ✅ Protected Dashboard */}
         <Route
           path="/dashboard"
           element={
@@ -77,7 +80,7 @@ function Layout() {
         />
       </Routes>
 
-      {!hideLayout && <Footer />} {/* ✅ Example: only render footer if needed */}
+      {!hideLayout && <Footer />}
     </>
   );
 }
@@ -87,7 +90,7 @@ export default function App() {
     <AuthProvider>
       <Router>
         <Layout />
-        {/* ✅ Toast Container should be global */}
+        {/* ✅ Toast Container (global) */}
         <ToastContainer
           position="top-right"
           autoClose={3000}
