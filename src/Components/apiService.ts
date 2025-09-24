@@ -1,4 +1,4 @@
-const API_BASE_URL = "https://banking-server-akka.onrender.com/api/dashboard";
+const API_BASE_URL = "http://localhost:5000/ai/insights";
 
 const apiService = {
   getDashboard: async () => {
@@ -7,3 +7,5 @@ const apiService = {
     return response.json();
   },
 };
+
+export default apiService;
