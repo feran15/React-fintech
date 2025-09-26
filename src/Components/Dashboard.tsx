@@ -7,7 +7,14 @@ import AIInsights from "../Components/AIInsight";
 import Transactions from "../Components/Transaction";
 import Spending from "./Spending";
 import { AlertCircle, RefreshCw, Menu, X } from "lucide-react";
-import apiService from "./apiService";
+import {
+   getCurrentUser,
+  getAccounts,
+  getTransactions,
+  getAnalytics,
+  getSpendingCategories,
+  getAIInsights,
+} from "../Components/apiService";
 import type { User, Account, Transaction, AnalyticsData, SpendingCategory, AIInsight } from "./types";
 
 const Dashboard: React.FC = () => {
@@ -27,14 +34,14 @@ const Dashboard: React.FC = () => {
       setRefreshing(true);
       setError(null);
 
-      const [u, a, t, an, sc, ai] = await Promise.all([
-        apiService.getCurrentUser(),
-        apiService.getAccounts(),
-        apiService.getTransactions(10),
-        apiService.getAnalytics(),
-        apiService.getSpendingCategories(),
-        apiService.getAIInsights(),
-      ]);
+     const [u, a, t, an, sc, ai] = await Promise.all([
+  getCurrentUser(),
+  getAccounts(),
+  getTransactions(10),
+  getAnalytics(),
+  getSpendingCategories(),
+  getAIInsights(),
+]);
 
       setUser(u);
       setAccounts(a);

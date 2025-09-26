@@ -47,10 +47,10 @@ export interface SpendingCategory {
   color: string;
 }
 
-export interface AIInsight {
-  id: string;
-  title: string;
-  description: string;
-  type: 'positive' | 'negative' | 'neutral';
-  confidence: number;
-}
+ export interface AIInsight {
+   id: string;
+   title: string;
+   description: string;
+   type: 'positive' | 'negative' | 'neutral';
+   confidence: number;
+ }
