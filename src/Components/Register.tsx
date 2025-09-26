@@ -1,51 +1,35 @@
-import { useForm } from "react-hook-form";
-import type { SubmitHandler } from "react-hook-form";
+// Register.tsx
+import { useForm, } from "react-hook-form";
+import  type { SubmitHandler } from "react-hook-form";
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import axios from "axios";
 import { toast } from "react-toastify";
-import { useAuth } from "../context/AuthContext"; // ✅ connect to AuthContext
+import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { useAuth } from "../context/AuthContext";
 
-// ✅ Type for form data
-type AuthFormData = {
+type RegisterFormData = {
   firstName: string;
   lastName: string;
   email: string;
   password: string;
 };
 
-interface RegisterFormProps {
+interface RegisterProps {
   switchToLogin: () => void;
-  onSuccess: () => void | Promise<void>;
+  onSuccess?: () => void;
 }
 
-const Register: React.FC<RegisterFormProps> = ({ switchToLogin, onSuccess }) => {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<AuthFormData>();
+const Register: React.FC<RegisterProps> = ({ switchToLogin, onSuccess }) => {
+  const { register: formRegister, handleSubmit, formState } = useForm<RegisterFormData>();
+  const { errors, isSubmitting } = formState;
 
   const [showPassword, setShowPassword] = useState(false);
-  const { login } = useAuth(); // ✅ from AuthContext
+  const { register } = useAuth();
 
-  // ✅ Submit handler
-  const onSubmit: SubmitHandler<AuthFormData> = async (data) => {
+  const onSubmit: SubmitHandler<RegisterFormData> = async (data) => {
     try {
-      const res = await axios.post("http://localhost:5000/api/User/register", data);
-
-      // ✅ Save token via AuthContext
-      login(res.data.token);
-
-      // ✅ Optionally save user info
-      if (res.data.user) {
-        localStorage.setItem("user", JSON.stringify(res.data.user));
-      }
-
+      await register(data);
       toast.success("Registration successful!");
-
-      // ✅ Redirect to dashboard
-      onSuccess();
+      if (onSuccess) onSuccess();
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Registration failed");
     }
@@ -54,92 +38,57 @@ const Register: React.FC<RegisterFormProps> = ({ switchToLogin, onSuccess }) => 
   return (
     <div className="bg-black min-h-screen flex items-center justify-center">
       <div className="bg-[rgb(27,27,27)] p-8 rounded-lg shadow-lg border w-full max-w-md">
-        <Link to="/">
-          <img className="w-[100px] ms-35" src="/Bg.png" alt="logo" />
-        </Link>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <input
+            type="text"
+            {...formRegister("firstName", { required: "First name required" })}
+            placeholder="First Name"
+            className="w-full p-2 border rounded placeholder-white bg-transparent text-white"
+          />
+          {errors.firstName && <p className="text-red-500">{errors.firstName.message}</p>}
 
-        <form onSubmit={handleSubmit(onSubmit)}>
-          {/* First Name */}
-          <div className="mb-4">
+          <input
+            type="text"
+            {...formRegister("lastName", { required: "Last name required" })}
+            placeholder="Last Name"
+            className="w-full p-2 border rounded placeholder-white bg-transparent text-white"
+          />
+          {errors.lastName && <p className="text-red-500">{errors.lastName.message}</p>}
+
+          <input
+            type="email"
+            {...formRegister("email", { required: "Email required" })}
+            placeholder="Email"
+            className="w-full p-2 border rounded placeholder-white bg-transparent text-white"
+          />
+          {errors.email && <p className="text-red-500">{errors.email.message}</p>}
+
+          <div className="flex items-center border rounded">
             <input
-              type="text"
-              {...register("firstName", { required: "First name is required" })}
-              className="w-full p-2 border rounded placeholder-white"
-              placeholder="First Name"
+              type={showPassword ? "text" : "password"}
+              {...formRegister("password", { required: "Password required" })}
+              placeholder="Password"
+              className="w-full p-2 placeholder-white bg-transparent text-white"
             />
-            {errors.firstName && (
-              <p className="text-red-500 text-sm">{errors.firstName.message}</p>
-            )}
+            <button type="button" onClick={() => setShowPassword(!showPassword)} className="p-2 text-teal-500">
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
           </div>
+          {errors.password && <p className="text-red-500">{errors.password.message}</p>}
 
-          {/* Last Name */}
-          <div className="mb-4">
-            <input
-              type="text"
-              {...register("lastName", { required: "Last name is required" })}
-              className="w-full p-2 border rounded placeholder-white"
-              placeholder="Last Name"
-            />
-            {errors.lastName && (
-              <p className="text-red-500 text-sm">{errors.lastName.message}</p>
-            )}
-          </div>
-
-          {/* Email */}
-          <div className="mb-4">
-            <input
-              type="email"
-              {...register("email", { required: "Email is required" })}
-              className="w-full p-2 border rounded placeholder-white"
-              placeholder="Email"
-            />
-            {errors.email && (
-              <p className="text-red-500 text-sm">{errors.email.message}</p>
-            )}
-          </div>
-
-          {/* Password */}
-          <div className="mb-4">
-            <div className="flex">
-              <input
-                type={showPassword ? "text" : "password"}
-                {...register("password", { required: "Password is required" })}
-                className="w-full p-2 border rounded placeholder-white"
-                placeholder="Password"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="ml-2 text-sm text-teal-500"
-              >
-                {showPassword ? "Hide" : "Show"}
-              </button>
-            </div>
-            {errors.password && (
-              <p className="text-red-500 text-sm">{errors.password.message}</p>
-            )}
-          </div>
-
-          {/* Submit button */}
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full bg-teal-600 font-semibold py-2 rounded hover:bg-teal-700 transition"
+            className="w-full bg-teal-600 py-2 rounded hover:bg-teal-700 flex justify-center items-center"
           >
-            {isSubmitting ? "Registering..." : "Register"}
+            {isSubmitting ? <Loader2 className="animate-spin" size={20} /> : "Register"}
           </button>
         </form>
 
         <p className="mt-4 text-center text-sm">
-          Already have an account?{" "}
-          <Link
-            to="/login"
-            type="button"
-            onClick={switchToLogin}
-            className="text-teal-600 font-semibold hover:cursor-pointer"
-          >
-            Log in
-          </Link>
+          <button onClick={switchToLogin} className="text-teal-600 font-semibold">
+            Already have an account? Log in
+          </button>
         </p>
       </div>
     </div>

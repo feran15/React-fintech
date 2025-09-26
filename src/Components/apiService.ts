@@ -1,38 +1,36 @@
-// apiService.ts
-import axios from "axios";
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-const API_BASE = "http://localhost:5000"; // or your backend URL
+const AuthContext = createContext<any>(null);
 
-export async function getCurrentUser() {
-  const token = localStorage.getItem("token");
-  const res = await axios.get(`${API_BASE}/User/me`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  return res.data;
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = useState<any>(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const storedUser = localStorage.getItem("user");
+
+    if (!token) {
+      // 🚨 No token → redirect to login
+      navigate("/login");
+    } else if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, [navigate]);
+
+  const logout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    setUser(null);
+    navigate("/login");
+  };
+
+  return (
+    <AuthContext.Provider value={{ user, setUser, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
 }
 
-export async function getAccounts() {
-  const res = await axios.get(`${API_BASE}/accounts`);
-  return res.data;
-}
-
-export async function getTransactions(limit: number) {
-  const res = await axios.get(`${API_BASE}/transactions?limit=${limit}`);
-  return res.data;
-}
-
-export async function getAnalytics() {
-  const res = await axios.get(`${API_BASE}/analytics`);
-  return res.data;
-}
-
-export async function getSpendingCategories() {
-  const res = await axios.get(`${API_BASE}/spending`);
-  return res.data;
-}
-
-export async function getAIInsights() {
-  const res = await axios.get(`${API_BASE}/ai/insights`);
-  return res.data;
-}
-
+export const useAuth = () => useContext(AuthContext);

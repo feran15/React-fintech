@@ -1,100 +1,115 @@
-// Dashboard.tsx
-import React, { useState, useEffect } from "react";
-import Sidebar from "./Sidebar";
-import BalanceOverview from "./BalanceOverview";
-import Earnings from "./Earnings";
-import AIInsights from "../Components/AIInsight";
-import Transactions from "../Components/Transaction";
-import Spending from "./Spending";
-import { AlertCircle, RefreshCw, Menu, X } from "lucide-react";
-import {
-   getCurrentUser,
-  getAccounts,
-  getTransactions,
-  getAnalytics,
-  getSpendingCategories,
-  getAIInsights,
-} from "../Components/apiService";
-import type { User, Account, Transaction, AnalyticsData, SpendingCategory, AIInsight } from "./types";
+// components/Dashboard.tsx
+import React, { useEffect, useState } from 'react';
+import { useAuth } from '../context/AuthContext';
+import apiService from '../Components/apiService';
+import { useNavigate } from 'react-router-dom';
+
+interface UserData {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  accountNumber: string;
+  isEmailVerified: boolean;
+  lastLogin: string;
+}
+
+interface Account {
+  id: string;
+  type: string;
+  balance: number;
+  accountNumber: string;
+  currency: string;
+}
 
 const Dashboard: React.FC = () => {
-  const [user, setUser] = useState<User | null>(null);
+  const { user: authUser, token, logout } = useAuth();
+  const [userData, setUserData] = useState<UserData | null>(null);
   const [accounts, setAccounts] = useState<Account[]>([]);
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
-  const [spendingCategories, setSpendingCategories] = useState<SpendingCategory[]>([]);
-  const [aiInsights, setAIInsights] = useState<AIInsight[]>([]);
   const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-
-  const fetchDashboardData = async () => {
-    try {
-      setRefreshing(true);
-      setError(null);
-
-     const [u, a, t, an, sc, ai] = await Promise.all([
-  getCurrentUser(),
-  getAccounts(),
-  getTransactions(10),
-  getAnalytics(),
-  getSpendingCategories(),
-  getAIInsights(),
-]);
-
-      setUser(u);
-      setAccounts(a);
-      setTransactions(t);
-      setAnalytics(an);
-      setSpendingCategories(sc);
-      setAIInsights(ai);
-    } catch (err) {
-      console.error(err);
-      setError("Failed to load dashboard data. Please try again.");
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  };
+  const navigate = useNavigate();
 
   useEffect(() => {
-    fetchDashboardData();
-  }, []);
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        console.log('🔍 Fetching dashboard data...');
+
+        // Try to get user data
+        try {
+          const userResponse = await apiService.getCurrentUser();
+          setUserData(userResponse.user || userResponse);
+          console.log('✅ User data loaded');
+        } catch (userError) {
+          console.warn('⚠️ Could not load user data:', userError);
+        }
+
+        // Try to get accounts
+        try {
+          const accountsResponse = await apiService.getAccounts();
+          setAccounts(accountsResponse.accounts || accountsResponse.data || []);
+          console.log('✅ Accounts data loaded');
+        } catch (accountsError: any) {
+          if (accountsError.response?.status === 404) {
+            console.log('ℹ️ Accounts endpoint not available yet');
+            setAccounts([]);
+          } else {
+            throw accountsError;
+          }
+        }
+
+      } catch (error: any) {
+        console.error('❌ Dashboard error:', error);
+        
+        if (error.response?.status === 401) {
+          logout();
+          navigate('/login');
+        } else if (error.response?.status === 404) {
+          setError('Backend endpoint not available. Please check if the server is running.');
+        } else {
+          setError(error.response?.data?.message || 'Failed to load dashboard');
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (token) {
+      fetchData();
+    } else {
+      navigate('/login');
+    }
+  }, [token, navigate, logout]);
 
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-black via-green-900 to-emerald-900 p-4">
-        <div className="flex flex-col items-center justify-center space-y-6">
-          <div className="relative">
-            <div className="w-16 h-16 border-4 border-green-500/30 rounded-full"></div>
-            <div className="absolute top-0 left-0 w-16 h-16 border-4 border-transparent border-t-green-500 rounded-full animate-spin"></div>
-          </div>
-          <div className="text-center">
-            <h2 className="text-xl font-semibold text-white mb-2">NeuroBank Dashboard</h2>
-            <p className="text-green-200">Loading your financial insights...</p>
-          </div>
-        </div>
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="text-white text-xl">Loading dashboard...</div>
       </div>
     );
   }
 
-  if (error && !refreshing) {
+  if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-black via-green-900 to-emerald-900 p-4">
-        <div className="text-center max-w-md">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-red-500/20 rounded-full mb-4">
-            <AlertCircle className="w-8 h-8 text-red-500" />
-          </div>
-          <h2 className="text-xl font-semibold text-white mb-2">Something went wrong</h2>
-          <p className="text-green-200 mb-6">{error}</p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <button
-              onClick={() => fetchDashboardData()}
-              className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="text-white text-center max-w-md">
+          <h2 className="text-2xl text-red-500 mb-4">Connection Issue</h2>
+          <p className="mb-4">{error}</p>
+          <div className="space-x-4">
+            <button 
+              onClick={() => window.location.reload()}
+              className="bg-teal-600 px-4 py-2 rounded"
             >
-              <RefreshCw className="w-4 h-4" />
-              Try Again
+              Retry
+            </button>
+            <button 
+              onClick={logout}
+              className="bg-gray-600 px-4 py-2 rounded"
+            >
+              Logout
             </button>
           </div>
         </div>
@@ -102,65 +117,66 @@ const Dashboard: React.FC = () => {
     );
   }
 
-  return (
-    <div className="min-h-screen flex bg-gradient-to-br from-black via-green-900 to-emerald-900 text-white">
-      {/* Mobile Sidebar Overlay */}
-      <div 
-        className={`fixed inset-0 z-50 bg-black/70 backdrop-blur-sm transition-opacity lg:hidden ${sidebarOpen ? "opacity-100 visible" : "opacity-0 invisible"}`} 
-        onClick={() => setSidebarOpen(false)}
-      ></div>
-      
-      {/* Sidebar */}
-      <div className={`fixed left-0 top-0 h-full z-50 w-64 transform transition-transform duration-300 lg:relative lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`}>
-        <Sidebar 
-          userName={user?.name} 
-          lastLoginDate={user?.lastLoginDate} 
-          isOpen={sidebarOpen}
-          onClose={() => setSidebarOpen(false)}
-        />
-      </div>
+  const totalBalance = accounts.reduce((sum, account) => sum + account.balance, 0);
 
-      {/* Main content */}
-      <div className="flex-1 flex flex-col lg:ml-64 p-4 md:p-6">
-        {/* Mobile header */}
-        <div className="lg:hidden mb-4 flex justify-between items-center">
-          <h1 className="text-xl font-bold">Dashboard</h1>
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-white p-8">
+      <div className="max-w-6xl mx-auto">
+        {/* Header */}
+        <div className="flex justify-between items-center mb-8">
+          <div>
+            <h1 className="text-3xl font-bold">
+              Welcome, {userData?.firstName || 'User'}!
+            </h1>
+            <p className="text-gray-400">
+              {userData?.accountNumber ? `Account: ${userData.accountNumber}` : 'Dashboard'}
+            </p>
+          </div>
           <button
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="bg-white/10 backdrop-blur-xl p-2 rounded-lg"
+            onClick={logout}
+            className="bg-red-600 px-4 py-2 rounded hover:bg-red-700"
           >
-            {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            Logout
           </button>
         </div>
 
-        {/* Dashboard Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
-          {/* Left column - spans 2 cols on large screens */}
-          <div className="lg:col-span-2 space-y-4 md:space-y-6">
-            {/* Top row widgets */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
-              <BalanceOverview accounts={accounts} monthlyChange={analytics?.monthlyChange || 0} />
-              <Earnings
-                earnings={analytics?.earnings || 0}
-                change={analytics?.earningsChange || 0}
-                percentage={analytics?.earningsPercentage || 0}
-              />
-            </div>
-            
-            {/* Transactions - full width on all screens */}
-            <div className="w-full">
-              <Transactions transactions={transactions} />
-            </div>
-          </div>
+        {/* Total Balance */}
+        <div className="bg-gray-800 rounded-lg p-6 mb-8">
+          <h2 className="text-2xl font-semibold mb-4">Total Balance</h2>
+          <p className="text-4xl font-bold">${totalBalance.toLocaleString()}</p>
+        </div>
 
-          {/* Right column - full width on mobile, 1 col on desktop */}
-          <div className="space-y-4 md:space-y-6">
-            <AIInsights insights={aiInsights} />
-            <Spending
-              spending={analytics?.spending || 0}
-              change={analytics?.spendingChange || 0}
-              categories={spendingCategories}
-            />
+        {/* Accounts Section */}
+        <div className="bg-gray-800 rounded-lg p-6 mb-8">
+          <h2 className="text-2xl font-semibold mb-4">Your Accounts</h2>
+          {accounts.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {accounts.map((account) => (
+                <div key={account.id} className="bg-gray-700 p-4 rounded">
+                  <h3 className="font-semibold capitalize">{account.type}</h3>
+                  <p className="text-2xl font-bold mt-2">${account.balance.toLocaleString()}</p>
+                  <p className="text-gray-400 text-sm">{account.accountNumber}</p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <p className="text-gray-400 mb-4">No accounts found</p>
+              <p className="text-sm text-gray-500">
+                The accounts endpoint might not be implemented yet on the backend.
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Backend Status */}
+        <div className="bg-blue-900 rounded-lg p-4">
+          <h3 className="font-semibold mb-2">Backend Connection Status</h3>
+          <div className="text-sm">
+            <p>✅ User endpoint: Connected</p>
+            <p>{accounts.length > 0 ? '✅' : '⚠️'} Accounts endpoint: {accounts.length > 0 ? 'Connected' : 'Not available'}</p>
+            <p>⚠️ Transactions endpoint: Coming soon</p>
+            <p>⚠️ Analytics endpoint: Coming soon</p>
           </div>
         </div>
       </div>
