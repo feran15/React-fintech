@@ -25,7 +25,7 @@ const Login: React.FC<LoginFormProps> = ({ switchToSignup, onSuccess }) => {
 
   const onSubmit: SubmitHandler<AuthFormData> = async (data) => {
     try {
-      await login(data.email, data.password);
+      await login(data);
       toast.success("Login successful!");
       if (onSuccess) onSuccess();
     } catch (error: any) {

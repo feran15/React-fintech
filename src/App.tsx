@@ -1,10 +1,4 @@
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  useLocation,
-  useNavigate,
-} from "react-router-dom";
+import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./context/ProtectedRoute";
 import { ToastContainer } from "react-toastify";
@@ -88,17 +82,15 @@ function Layout() {
 export default function App() {
   return (
     <AuthProvider>
-      <Router>
-        <Layout />
-        {/* ✅ Toast Container (global) */}
-        <ToastContainer
-          position="top-right"
-          autoClose={3000}
-          pauseOnHover
-          draggable
-          theme="dark"
-        />
-      </Router>
+      <Layout />
+      {/* ✅ Toast Container (global) */}
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        pauseOnHover
+        draggable
+        theme="dark"
+      />
     </AuthProvider>
   );
 }

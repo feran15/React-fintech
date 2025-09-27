@@ -1,36 +1,25 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
-const AuthContext = createContext<any>(null);
+const api = axios.create({
+  baseURL: "http://localhost:5000/api",
+  withCredentials: true,
+});
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<any>(null);
-  const navigate = useNavigate();
+// Login
+export const login = async (email: string, password: string) => {
+  const res = await api.post("/user/login", { email, password });
+  return res.data;
+};
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    const storedUser = localStorage.getItem("user");
+// Register
+export const register = async (userData: {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+}) => {
+  const res = await api.post("/user/register", userData);
+  return res.data;
+};
 
-    if (!token) {
-      // 🚨 No token → redirect to login
-      navigate("/login");
-    } else if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-  }, [navigate]);
-
-  const logout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    setUser(null);
-    navigate("/login");
-  };
-
-  return (
-    <AuthContext.Provider value={{ user, setUser, logout }}>
-      {children}
-    </AuthContext.Provider>
-  );
-}
-
-export const useAuth = () => useContext(AuthContext);
+export default { login, register };

@@ -1,70 +1,46 @@
-// AuthContext.tsx
-import React, { createContext, useContext, useState,  } from "react";
-import type { ReactNode } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import apiService from "../utils/api"; // Your axios instance
-
-type User = {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  accountNumber?: string;
-  isEmailVerified?: boolean;
-};
+import api from "../utils/api"; // 👈 your axios instance
 
 type AuthContextType = {
-  user: User | null;
-  setUser: (user: User | null) => void;
-  login: (email: string, password: string) => Promise<void>;
-  register: (userData: Partial<User> & { password: string }) => Promise<void>;
+  user: any;
+  setUser: React.Dispatch<React.SetStateAction<any>>;
+  login: (credentials: { email: string; password: string }) => Promise<void>;
   logout: () => void;
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-type AuthProviderProps = {
-  children: ReactNode;
-};
-
-export const AuthProvider = ({ children }: AuthProviderProps) => {
-  const [user, setUser] = useState<User | null>(
-    () => JSON.parse(localStorage.getItem("user") || "null")
-  );
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = useState<any>(null);
   const navigate = useNavigate();
 
-  const login = async (email: string, password: string) => {
-    const res = await apiService.login(email, password);
-    const loggedUser: User = res.user || {
-      id: "temp-id",
-      firstName: email.split("@")[0],
-      lastName: "User",
-      email,
-      accountNumber: "N/A",
-      isEmailVerified: false,
-    };
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const storedUser = localStorage.getItem("user");
 
-    localStorage.setItem("token", res.token);
-    localStorage.setItem("user", JSON.stringify(loggedUser));
-    setUser(loggedUser);
-    navigate("/dashboard");
-  };
+    if (!token) {
+      navigate("/login");
+    } else if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, [navigate]);
 
-  const register = async (userData: Partial<User> & { password: string }) => {
-    const res = await apiService.register(userData);
-    const newUser: User = res.user || {
-      id: "temp-id",
-      firstName: userData.firstName || "New",
-      lastName: userData.lastName || "User",
-      email: userData.email || "no-email",
-      accountNumber: "N/A",
-      isEmailVerified: false,
-    };
+  const login = async (credentials: { email: string; password: string }) => {
+    try {
+      const res = await api.post("/user/login", credentials); // ✅ adjust endpoint
+      const { token, user } = res.data;
 
-    localStorage.setItem("token", res.token);
-    localStorage.setItem("user", JSON.stringify(newUser));
-    setUser(newUser);
-    navigate("/dashboard");
+      // Save to localStorage
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(user));
+
+      setUser(user);
+      navigate("/dashboard");
+    } catch (error) {
+      console.error("Login failed:", error);
+      throw error; // so Login.tsx can catch
+    }
   };
 
   const logout = () => {
@@ -75,11 +51,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, setUser, login, register, logout }}>
+    <AuthContext.Provider value={{ user, setUser, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
-};
+}
 
 export const useAuth = () => {
   const ctx = useContext(AuthContext);
