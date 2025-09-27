@@ -1,46 +1,48 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../utils/api"; // 👈 your axios instance
+import apiService from "../utils/api"; // axios instance
+
+type User = {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  accountNumber?: string;
+  isEmailVerified?: boolean;
+};
 
 type AuthContextType = {
-  user: any;
-  setUser: React.Dispatch<React.SetStateAction<any>>;
+  user: User | null;
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
   login: (credentials: { email: string; password: string }) => Promise<void>;
   logout: () => void;
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<any>(null);
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     const storedUser = localStorage.getItem("user");
 
-    if (!token) {
-      navigate("/login");
-    } else if (storedUser) {
+    if (token && storedUser) {
       setUser(JSON.parse(storedUser));
     }
-  }, [navigate]);
+    setLoading(false);
+  }, []);
 
-  const login = async (credentials: { email: string; password: string }) => {
-    try {
-      const res = await api.post("/user/login", credentials); // ✅ adjust endpoint
-      const { token, user } = res.data;
+  const login = async ({ email, password }: { email: string; password: string }) => {
+    const res = await apiService.post("/user/login", { email, password });
+    const { token, user } = res.data;
 
-      // Save to localStorage
-      localStorage.setItem("token", token);
-      localStorage.setItem("user", JSON.stringify(user));
-
-      setUser(user);
-      navigate("/dashboard");
-    } catch (error) {
-      console.error("Login failed:", error);
-      throw error; // so Login.tsx can catch
-    }
+    localStorage.setItem("token", token);
+    localStorage.setItem("user", JSON.stringify(user));
+    setUser(user);
+    navigate("/dashboard");
   };
 
   const logout = () => {
@@ -52,10 +54,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <AuthContext.Provider value={{ user, setUser, login, logout }}>
-      {children}
+      {loading ? <p className="text-center mt-10">Loading...</p> : children}
     </AuthContext.Provider>
   );
-}
+};
 
 export const useAuth = () => {
   const ctx = useContext(AuthContext);
