@@ -21,5 +21,9 @@ export const register = async (userData: {
   const res = await api.post("/user/register", userData);
   return res.data;
 };
-
+// Get Dashboard Data
+export const getDashboardData = async () => {
+  const res = await api.get("/dashboard/body");
+  return res.data;
+}
 export default { login, register };
