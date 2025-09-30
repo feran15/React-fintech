@@ -23,11 +23,11 @@ const Register: React.FC<RegisterProps> = ({ switchToLogin, onSuccess }) => {
   const { errors, isSubmitting } = formState;
 
   const [showPassword, setShowPassword] = useState(false);
-  const { register } = useAuth();
+  const { Register } = useAuth();
 
   const onSubmit: SubmitHandler<RegisterFormData> = async (data) => {
     try {
-      await register(data);
+      await Register(data);
       toast.success("Registration successful!");
       if (onSuccess) onSuccess();
     } catch (error: any) {

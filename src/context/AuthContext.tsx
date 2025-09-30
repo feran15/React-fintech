@@ -15,6 +15,7 @@ type AuthContextType = {
   user: User | null;
   setUser: React.Dispatch<React.SetStateAction<User | null>>;
   login: (credentials: { email: string; password: string }) => Promise<void>;
+  Register: (data: { firstName: string; lastName: string; email: string; password: string }) => Promise<void>;
   logout: () => void;
 };
 
@@ -35,6 +36,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setLoading(false);
   }, []);
 
+  const Register = async (data: { firstName: string; lastName: string; email: string; password: string }) => {
+      const res = await apiService.post("/user/register", data);
+      const { token, user } = res.data;
+
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(user));
+      setUser(user);
+      navigate("/dashboard");
+  }
+      
   const login = async ({ email, password }: { email: string; password: string }) => {
     const res = await apiService.post("/user/login", { email, password });
     const { token, user } = res.data;
@@ -53,7 +64,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, setUser, login, logout }}>
+    <AuthContext.Provider value={{ user, setUser, login, Register, logout }}>
       {loading ? <p className="text-center mt-10">Loading...</p> : children}
     </AuthContext.Provider>
   );

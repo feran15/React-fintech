@@ -38,6 +38,7 @@ function Layout() {
               <HomeSection />
               <SubFooter />
               <Section />
+              <Footer />
               <FAQs />
             </>
           }
@@ -74,7 +75,7 @@ function Layout() {
         />
       </Routes>
 
-      {!hideLayout && <Footer />}
+      {!hideLayout}
     </>
   );
 }
