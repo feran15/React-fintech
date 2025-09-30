@@ -17,8 +17,9 @@ export const register = async (userData: {
   lastName: string;
   email: string;
   password: string;
+  // generatedaccountNumber: string;
 }) => {
-  const res = await api.post("/user/register", userData);
+  const res = await api.post("/User/register", userData);
   return res.data;
 };
 // Get Dashboard Data

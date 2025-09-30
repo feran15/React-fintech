@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Home, CreditCard, Send, List } from "lucide-react";
+import { Home, CreditCard, Send, List, LogOut } from "lucide-react";
 import { getDashboardData } from "./apiService";
 import { useAuth } from "../context/AuthContext";
 
@@ -21,8 +21,8 @@ interface UserData {
 export default function Dashboard() {
   const [dashboardData, setDashboardData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
-  const { user: authUser } = useAuth(); // 👈 renamed
-  const accountType = authUser?.isEmailVerified ? "Savings" : "Basic";
+  const { user: authUser, logout } = useAuth(); // 👈 get logout from context
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -48,17 +48,19 @@ export default function Dashboard() {
         {/* Balance Card */}
         <div className="bg-gray-900 p-6 rounded-2xl shadow flex flex-col sm:flex-row sm:items-center sm:justify-between">
           <div>
+
             <h2 className="text-lg font-semibold text-green-400">
               Available Balance
             </h2>
-            <p className="text-3xl sm:text-4xl font-bold mt-2">
-              ₦{(dashboardData.balance ?? 250000).toLocaleString()}
+            {/* 👇 Greeting in balance card */}
+            <p className="text-sm text-gray-400 mb-4">
+              Account Number: {dashboardData.accountNumber || "1234567890"}
             </p>
-            <p className="text-sm text-gray-400">
-              Account Number: {dashboardData.accountNumber}
+            <p className="text-3xl sm:text-4xl font-bold mt-2">
+              ₦{(dashboardData.balance ?? 1500000).toLocaleString()}
             </p>
           </div>
-          <button className="mt-4 sm:mt-0 bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg">
+          <button className="mt-4 sm:mt-0 bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg cursor-pointer">
             New Payment
           </button>
         </div>
@@ -95,12 +97,11 @@ export default function Dashboard() {
 
       {/* Sidebar for Desktop */}
       <aside className="hidden md:flex fixed top-0 left-0 h-screen w-64 bg-gray-950 p-6 flex-col">
-        {/* 👇 Personalized greeting */}
         <h1 className="text-2xl font-bold text-green-400 mb-2">
           Welcome, {authUser?.firstName || "Guest"}
         </h1>
         <p className="text-sm text-gray-400 mb-8">
-          Account: {dashboardData.accountType}
+          Account: {dashboardData.accountType || "Basic"}
         </p>
 
         <nav className="flex flex-col gap-4">
@@ -116,6 +117,14 @@ export default function Dashboard() {
           <a href="#" className="flex items-center gap-2 hover:text-green-400">
             <List size={18} /> Transactions
           </a>
+
+          {/* 🚪 Logout Button */}
+          <button
+            onClick={logout}
+            className="flex items-center gap-2 mt-6 text-red-400 hover:text-red-500"
+          >
+            <LogOut size={18} /> Logout
+          </button>
         </nav>
       </aside>
     </div>
