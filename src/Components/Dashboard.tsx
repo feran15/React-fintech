@@ -21,7 +21,7 @@ interface UserData {
 export default function Dashboard() {
   const [dashboardData, setDashboardData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
-  const { user: authUser, logout } = useAuth(); // 👈 get logout from context
+  const { user: authUser, logout } = useAuth();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -39,7 +39,20 @@ export default function Dashboard() {
   }, []);
 
   if (loading) return <p className="text-white">Loading...</p>;
-  if (!dashboardData) return <p className="text-red-500">Failed to load data</p>;
+
+  if (!dashboardData) {
+    return (
+      <div className="flex flex-col items-center justify-center h-screen text-red-500">
+        <p>Failed to load data</p>
+        <button
+          onClick={() => window.location.reload()}
+          className="mt-3 bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg text-white"
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col min-h-screen bg-black text-white">
@@ -48,16 +61,14 @@ export default function Dashboard() {
         {/* Balance Card */}
         <div className="bg-gray-900 p-6 rounded-2xl shadow flex flex-col sm:flex-row sm:items-center sm:justify-between">
           <div>
-
             <h2 className="text-lg font-semibold text-green-400">
               Available Balance
             </h2>
-            {/* 👇 Greeting in balance card */}
             <p className="text-sm text-gray-400 mb-4">
               Account Number: {dashboardData.accountNumber || "1234567890"}
             </p>
             <p className="text-3xl sm:text-4xl font-bold mt-2">
-              ₦{(dashboardData.balance ?? 1500000).toLocaleString()}
+              ₦{(dashboardData.balance ?? 0).toLocaleString()}
             </p>
           </div>
           <button className="mt-4 sm:mt-0 bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg cursor-pointer">
@@ -84,9 +95,11 @@ export default function Dashboard() {
                   <tr key={t.id} className="border-b border-gray-700">
                     <td className="py-2">{t.description}</td>
                     <td className="py-2 text-green-400">
-                      ₦{t.amount.toLocaleString()}
+                      ₦{(t.amount ?? 0).toLocaleString()}
                     </td>
-                    <td className="py-2 text-green-400">{t.date}</td>
+                    <td className="py-2 text-green-400">
+                      {new Date(t.date).toLocaleDateString()}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -127,6 +140,26 @@ export default function Dashboard() {
           </button>
         </nav>
       </aside>
+
+      {/* Bottom Nav for Mobile */}
+      <nav className="md:hidden fixed bottom-0 left-0 w-full bg-gray-950 flex justify-around py-3 border-t border-gray-800">
+        <a href="#" className="flex flex-col items-center text-gray-400 hover:text-green-400">
+          <Home size={20} />
+          <span className="text-xs">Home</span>
+        </a>
+        <a href="#" className="flex flex-col items-center text-gray-400 hover:text-green-400">
+          <CreditCard size={20} />
+          <span className="text-xs">Accounts</span>
+        </a>
+        <a href="#" className="flex flex-col items-center text-gray-400 hover:text-green-400">
+          <Send size={20} />
+          <span className="text-xs">Pay</span>
+        </a>
+        <a href="#" className="flex flex-col items-center text-gray-400 hover:text-green-400">
+          <List size={20} />
+          <span className="text-xs">Txns</span>
+        </a>
+      </nav>
     </div>
   );
 }
