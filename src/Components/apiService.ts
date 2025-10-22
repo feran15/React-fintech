@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://localhost:5000/api",
+  baseURL: "https://bankingserver-production.up.railway.app/",
   withCredentials: true,
 });
 
@@ -17,14 +17,20 @@ export const register = async (userData: {
   lastName: string;
   email: string;
   password: string;
-  // generatedaccountNumber: string;
+  accountNumber: string;
 }) => {
-  const res = await api.post("/User/register", userData);
+  const res = await api.post("/user/register", userData);
   return res.data;
 };
 // Get Dashboard Data
 export const getDashboardData = async () => {
-  const res = await api.get("/dashboard/body");
+  const token = localStorage.getItem("token");
+  const res = await api.get("/api/dashboard/body", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
   return res.data;
-}
+};
+
 export default { login, register };

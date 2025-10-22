@@ -11,10 +11,10 @@ interface Transaction {
 }
 
 interface UserData {
-  firstName?: string;
+  firstName: string;
   accountNumber: string;
   balance: number;
-  accountType?: string;
+  accountType: string;
   transactions: Transaction[];
 }
 
@@ -27,7 +27,17 @@ export default function Dashboard() {
     const fetchData = async () => {
       try {
         const data = await getDashboardData();
-        setDashboardData(data);
+
+        // 🔹 Pull stored account number (from login/register)
+        const storedAccNum =
+          localStorage.getItem("accountNumber") ||
+          JSON.parse(localStorage.getItem("user") || "{}")?.accountNumber;
+
+        // 🔹 Merge with dashboard data
+        setDashboardData({
+          ...data,
+          accountNumber: storedAccNum || data.accountNumber || "Unavailable",
+        });
       } catch (err) {
         console.error("Error fetching dashboard data", err);
       } finally {
@@ -65,7 +75,7 @@ export default function Dashboard() {
               Available Balance
             </h2>
             <p className="text-sm text-gray-400 mb-4">
-              Account Number: {dashboardData.accountNumber || "1234567890"}
+              Account Number: {dashboardData.accountNumber}
             </p>
             <p className="text-3xl sm:text-4xl font-bold mt-2">
               ₦{(dashboardData.balance ?? 0).toLocaleString()}
@@ -91,17 +101,25 @@ export default function Dashboard() {
                 </tr>
               </thead>
               <tbody>
-                {dashboardData.transactions.map((t) => (
-                  <tr key={t.id} className="border-b border-gray-700">
-                    <td className="py-2">{t.description}</td>
-                    <td className="py-2 text-green-400">
-                      ₦{(t.amount ?? 0).toLocaleString()}
-                    </td>
-                    <td className="py-2 text-green-400">
-                      {new Date(t.date).toLocaleDateString()}
+                {dashboardData.transactions?.length ? (
+                  dashboardData.transactions.map((t) => (
+                    <tr key={t.id} className="border-b border-gray-700">
+                      <td className="py-2">{t.description}</td>
+                      <td className="py-2 text-green-400">
+                        ₦{(t.amount ?? 0).toLocaleString()}
+                      </td>
+                      <td className="py-2 text-green-400">
+                        {new Date(t.date).toLocaleDateString()}
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td className="py-4 text-gray-400" colSpan={3}>
+                      No recent transactions
                     </td>
                   </tr>
-                ))}
+                )}
               </tbody>
             </table>
           </div>
