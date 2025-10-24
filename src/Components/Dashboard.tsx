@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Home, CreditCard, Send, List, LogOut } from "lucide-react";
 import { getDashboardData } from "./apiService";
 import { useAuth } from "../context/AuthContext";
-
+import PaymentModal from './PaymentModal'
 interface Transaction {
   id: number;
   description: string;
@@ -22,7 +22,7 @@ export default function Dashboard() {
   const [dashboardData, setDashboardData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
   const { user: authUser, logout } = useAuth();
-
+  const [showPayment, setShowpayment] = useState(false)
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -81,9 +81,12 @@ export default function Dashboard() {
               ₦{(dashboardData.balance ?? 0).toLocaleString()}
             </p>
           </div>
-          <button className="mt-4 sm:mt-0 bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg cursor-pointer">
+          <button 
+            onClick={() => setShowpayment(true)}
+          className="mt-4 sm:mt-0 bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg cursor-pointer">
             New Payment
           </button>
+           {showPayment && <PaymentModal onClose={() => setShowpayment(false)} />}
         </div>
 
         {/* Transactions */}
