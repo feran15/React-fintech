@@ -78,7 +78,7 @@ export default function Dashboard() {
               Account Number: {dashboardData.accountNumber}
             </p>
             <p className="text-3xl sm:text-4xl font-bold mt-2">
-              ₦{(dashboardData.balance ?? 0).toLocaleString()}
+              ₦500,000.00
             </p>
           </div>
           <button 
