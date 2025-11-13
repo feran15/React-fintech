@@ -92,7 +92,7 @@ const Register: React.FC<RegisterProps> = ({ switchToLogin, onSuccess }) => {
         </form>
 
         <p className="mt-4 text-center text-sm">
-          <button onClick={switchToLogin} className="text-teal-600 font-semibold">
+          <button onClick={switchToLogin} className="text-teal-600 font-semibold cursor-pointer">
             Already have an account? Log in
           </button>
         </p>

@@ -76,7 +76,7 @@ const Login: React.FC<LoginFormProps> = ({ switchToSignup, onSuccess }) => {
         </form>
 
         <p className="mt-4 text-center text-sm">
-          <button onClick={switchToSignup} className="text-teal-600 font-semibold">
+          <button onClick={switchToSignup} className="text-teal-600 font-semibold cursor-pointer">
             Create an account
           </button>
         </p>
