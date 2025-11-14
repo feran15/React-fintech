@@ -1,63 +1,86 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-export default function PaymentModal({ onClose }: { onClose: () => void }) {
+interface PaymentModalProps {
+  onClose: () => void;
+  userToken: string; // Pass logged-in user token
+  senderId: string; // Logged-in user's ID
+}
+
+interface Recipient {
+  _id: string;
+  name: string;
+  accountNumber: string;
+}
+
+export default function PaymentModal({ onClose, userToken, senderId }: PaymentModalProps) {
   const [amount, setAmount] = useState("");
   const [accountNumber, setAccountNumber] = useState("");
-  const [recipientName, setRecipientName] = useState("");
+  const [recipient, setRecipient] = useState<Recipient | null>(null);
   const [transactionPin, setTransactionPin] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // ✅ Auto-fetch recipient name when account number is 10 digits
+  // ✅ Auto-fetch recipient info
   useEffect(() => {
     const fetchRecipient = async () => {
       if (accountNumber.length === 10) {
         setLoading(true);
         setError("");
         try {
-          const res = await fetch(`http://localhost:5000/api/User/${accountNumber}`);
+          const res = await fetch(`http://localhost:5000/api/User/verify/:accountNumber`, {
+            headers: {
+              Authorization: `Bearer ${userToken}`,
+              "Content-Type": "application/json",
+            },
+          });
+
           const data = await res.json();
 
           if (data.success) {
-            setRecipientName(data.data.name);
+            setRecipient(data.data);
           } else {
-            setRecipientName("");
-            setError("Recipient not found");
+            setRecipient(null);
+            setError(data.message || "Recipient not found");
           }
         } catch (err) {
-          setRecipientName("");
+          setRecipient(null);
           setError("Error fetching recipient");
         } finally {
           setLoading(false);
         }
       } else {
-        setRecipientName("");
+        setRecipient(null);
         setError("");
       }
     };
 
     fetchRecipient();
-  }, [accountNumber]);
+  }, [accountNumber, userToken]);
 
-
-  // ✅ Handle transaction submission
+  // ✅ Handle payment submission
   const handlePayment = async () => {
-    if (!amount || !accountNumber || !recipientName || !transactionPin) return alert("Please fill all fields");
+    if (!amount || !accountNumber || !recipient || !transactionPin) {
+      return alert("Please fill all fields");
+    }
 
     try {
-      const response = await fetch("http://localhost:5000/api/transactions", {
+      const res = await fetch("http://localhost:5000/api/transactions", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${userToken}`,
+        },
         body: JSON.stringify({
-          senderId: "yourSenderIdHere", // replace with logged-in user's ID
-          receiverId: "fetchedUserIdHere", // ideally store this from backend lookup
+          senderId,
+          receiverId: recipient._id,
           amount,
+          transactionPin,
           description: "Transfer",
         }),
       });
 
-      const data = await response.json();
+      const data = await res.json();
       if (data.success) {
         alert("Transaction successful ✅");
         onClose();
@@ -102,25 +125,25 @@ export default function PaymentModal({ onClose }: { onClose: () => void }) {
             className="w-full p-2 mb-3 bg-gray-800 rounded"
           />
 
-             <input
-            type="text"
-            value={recipientName}
-            className="w-full p-2 mb-3 bg-gray-800 rounded"
-            disabled
-          />
+          {loading && <p className="text-sm text-gray-400 mb-2">Looking up recipient...</p>}
+          {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
 
-          {loading ? (
-            <p className="text-sm text-gray-400 mb-2">Looking up recipient...</p>
-          ) : recipientName ? (
+          {recipient && (
             <input
               type="text"
-              value={recipientName}
+              value={recipient.name}
               readOnly
               className="w-full p-2 mb-3 bg-gray-700 text-white rounded"
             />
-          ) : error ? (
-            <p className="text-red-500 text-sm mb-2">{error}</p>
-          ) : null}
+          )}
+
+          <input
+            type="password"
+            placeholder="Transaction PIN"
+            value={transactionPin}
+            onChange={(e) => setTransactionPin(e.target.value)}
+            className="w-full p-2 mb-3 bg-gray-800 rounded"
+          />
 
           <div className="flex justify-between mt-4">
             <button
