@@ -5,6 +5,7 @@ export default function PaymentModal({ onClose }: { onClose: () => void }) {
   const [amount, setAmount] = useState("");
   const [accountNumber, setAccountNumber] = useState("");
   const [recipientName, setRecipientName] = useState("");
+  const [transactionPin, setTransactionPin] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -15,7 +16,7 @@ export default function PaymentModal({ onClose }: { onClose: () => void }) {
         setLoading(true);
         setError("");
         try {
-          const res = await fetch(`http://localhost:4000/api/users/verify/${accountNumber}`);
+          const res = await fetch(`http://localhost:5000/api/User/${accountNumber}`);
           const data = await res.json();
 
           if (data.success) {
@@ -39,12 +40,13 @@ export default function PaymentModal({ onClose }: { onClose: () => void }) {
     fetchRecipient();
   }, [accountNumber]);
 
+
   // ✅ Handle transaction submission
   const handlePayment = async () => {
-    if (!amount || !accountNumber || !recipientName) return alert("Please fill all fields");
+    if (!amount || !accountNumber || !recipientName || !transactionPin) return alert("Please fill all fields");
 
     try {
-      const response = await fetch("http://localhost:4000/api/transactions", {
+      const response = await fetch("http://localhost:5000/api/transactions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -102,7 +104,7 @@ export default function PaymentModal({ onClose }: { onClose: () => void }) {
 
              <input
             type="text"
-            value={accountNumber}
+            value={recipientName}
             className="w-full p-2 mb-3 bg-gray-800 rounded"
             disabled
           />
