@@ -3,6 +3,7 @@ import { Home, CreditCard, Send, List, LogOut } from "lucide-react";
 import { getDashboardData } from "./apiService";
 import { useAuth } from "../context/AuthContext";
 import PaymentModal from './PaymentModal'
+import PinInput from './PinInput';
 interface Transaction {
   id: number;
   description: string;
@@ -23,6 +24,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const { user: authUser, logout } = useAuth();
   const [showPayment, setShowpayment] = useState(false)
+  const [TransactionPin, setTransactionPin] = useState(false)
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -63,7 +65,9 @@ export default function Dashboard() {
       </div>
     );
   }
-
+      <div>
+       
+      </div>
   return (
     <div className="flex flex-col min-h-screen bg-black text-white">
       {/* Main Content */}
@@ -151,6 +155,14 @@ export default function Dashboard() {
           <a href="#" className="flex items-center gap-2 hover:text-green-400">
             <List size={18} /> Transactions
           </a>
+                {/* Transaction Pin registration */}
+
+             <button 
+            onClick={() => setTransactionPin(true)}
+          className="mt-4 sm:mt-0 bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg cursor-pointer">
+           Set Transaction Pin
+          </button>
+           {TransactionPin && <PinInput onClose={() => setTransactionPin(false)} />}
 
           {/* 🚪 Logout Button */}
           <button
