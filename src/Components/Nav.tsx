@@ -73,7 +73,7 @@ const Nav: React.FC = () => {
 
       {/* Mobile Menu */}
       {isOpen && (
-        <div className="md:hidden bg-white px-6 py-4 shadow-lg h-screen">
+        <div className="md:hidden bg-white px-6 py-4 shadow-lg h-screen overflow-hidden">
           {/* Top Section: Logo + Close */}
           <div className="flex justify-between items-center mb-6">
           </div>

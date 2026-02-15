@@ -32,9 +32,11 @@ function Layout() {
       <Routes>
         <Route
           path="/"
+          
           element={
             <>
-              <Home />
+            
+              <Home  />
               <HomeSection />
               <SubFooter />
               <Section />
