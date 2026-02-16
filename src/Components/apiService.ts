@@ -7,7 +7,7 @@ const api = axios.create({
 
 // Login
 export const login = async (email: string, password: string) => {
-  const res = await api.post("/api/User/login", { email, password });
+  const res = await api.post("/User/login", { email, password });
   return res.data;
 };
 
@@ -25,7 +25,7 @@ export const register = async (userData: {
 // Get Dashboard Data
 export const getDashboardData = async () => {
   const token = localStorage.getItem("token");
-  const res = await api.get("/api/dashboard/body", {
+  const res = await api.get("/dashboard/body", {
     headers: {
       Authorization: `Bearer ${token}`,
     },

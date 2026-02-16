@@ -19,7 +19,7 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
   const [loadingRecipient, setLoadingRecipient] = useState(false);
   const [loadingPayment, setLoadingPayment] = useState(false);
   const [error, setError] = useState("");
-
+  const BASE_URL = import.meta.env.VITE_BACKEND_SERVER_URL 
   // Debounced API call for recipient lookup
   useEffect(() => {
     const fetchRecipient = async () => {
@@ -37,7 +37,7 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
 
       try {
         const res = await fetch(
-          `http://localhost:5000/api/User/verify/${accountNumber}`,
+          `${BASE_URL}/User/verify/${accountNumber}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -104,7 +104,7 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
     setLoadingPayment(true);
 
     try {
-      const res = await fetch("http://localhost:5000/api/transactions/new", {
+      const res = await fetch(`${BASE_URL}/transactions/new`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
