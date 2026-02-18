@@ -1,7 +1,8 @@
 import axios from "axios";
+// import { Meta } from "react-router-dom";
 
 const api = axios.create({
-  baseURL: "http://localhost:5000/",
+  baseURL: import.meta.env.VITE_BACKEND_SERVER_URL,
   withCredentials: true,
 });
 
